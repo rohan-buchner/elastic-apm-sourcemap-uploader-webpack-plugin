@@ -118,15 +118,16 @@ class ElasticApmSourceMapPlugin {
     form.append('bundle_filepath', this.getPublicPath(sourceFile));
     form.append('service_name', this.serviceName);
 
-    const headers = {}
-    if(this.accessToken)
-      headers.Authorization =  `ApiKey ${this.accessToken}`;
+    const headers = {};
+    if (this.accessToken) {
+      headers.Authorization = `ApiKey ${this.accessToken}`;
+    }
 
     let res;
     try {
       res = await fetch(this.apmEndpoint, {
+        headers,
         method: 'POST',
-        headers: headers,
         body: form
       });
     } catch (err) {
