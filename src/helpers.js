@@ -1,7 +1,7 @@
 import VError from 'verror';
 import isFunction from 'lodash.isfunction';
 import isString from 'lodash.isstring';
-import { PLUGIN_NAME, ROLLBAR_REQ_FIELDS } from './constants';
+import { PLUGIN_NAME, ELASTIC_APM_REQ_FIELDS } from './constants';
 
 // Take a single Error or array of Errors and return an array of errors that
 // have message prefixed.
@@ -17,7 +17,7 @@ export function handleError(err, prefix = PLUGIN_NAME) {
 // Validate required options and return an array of errors or null if there
 // are no errors.
 export function validateOptions(ref) {
-  const errors = ROLLBAR_REQ_FIELDS.reduce((result, field) => {
+  const errors = ELASTIC_APM_REQ_FIELDS.reduce((result, field) => {
     if (
       field === 'publicPath' &&
       ref?.[field] &&

@@ -1,30 +1,33 @@
 import { promises as fs } from 'fs';
+
 import { join } from 'path';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
 import isString from 'lodash.isstring';
 import VError from 'verror';
 import { handleError, validateOptions } from './helpers';
-import { PLUGIN_NAME, ROLLBAR_ENDPOINT } from './constants';
+import { PLUGIN_NAME, ELASTIC_APM_ENDPOINT } from './constants';
 
-class RollbarSourceMapPlugin {
+class ElasticApmSourceMapPlugin {
   constructor({
     accessToken,
+    serviceName,
     version,
     publicPath,
     includeChunks = [],
     silent = false,
     ignoreErrors = false,
-    rollbarEndpoint = ROLLBAR_ENDPOINT,
+    apmEndpoint = ELASTIC_APM_ENDPOINT,
     encodeFilename = false
   }) {
     this.accessToken = accessToken;
+    this.serviceName = serviceName;
     this.version = version;
     this.publicPath = publicPath;
     this.includeChunks = [].concat(includeChunks);
     this.silent = silent;
     this.ignoreErrors = ignoreErrors;
-    this.rollbarEndpoint = rollbarEndpoint;
+    this.apmEndpoint = apmEndpoint;
     this.encodeFilename = encodeFilename;
   }
 
@@ -110,18 +113,20 @@ class RollbarSourceMapPlugin {
     }
 
     const form = new FormData();
-    form.append('access_token', this.accessToken);
-    form.append('version', this.version);
-    form.append('minified_url', this.getPublicPath(sourceFile));
-    form.append('source_map', sourceMapSource, {
-      filename: sourceMap,
-      contentType: 'application/json'
-    });
+    form.append('sourcemap', sourceMapSource);
+    form.append('service_version', this.version);
+    form.append('bundle_filepath', this.getPublicPath(sourceFile));
+    form.append('service_name', this.serviceName);
+
+    const headers = {}
+    if(this.accessToken)
+      headers.Authorization =  `ApiKey ${this.accessToken}`;
 
     let res;
     try {
-      res = await fetch(this.rollbarEndpoint, {
+      res = await fetch(this.apmEndpoint, {
         method: 'POST',
+        headers: headers,
         body: form
       });
     } catch (err) {
@@ -146,7 +151,7 @@ class RollbarSourceMapPlugin {
     // Success
     if (!this.silent) {
       // eslint-disable-next-line no-console
-      console.info(`Uploaded ${sourceMap} to Rollbar`);
+      console.info(`Uploaded ${sourceMap} to Elastic APM`);
     }
   }
 
@@ -163,4 +168,4 @@ class RollbarSourceMapPlugin {
   }
 }
 
-module.exports = RollbarSourceMapPlugin;
+module.exports = ElasticApmSourceMapPlugin;

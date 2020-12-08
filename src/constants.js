@@ -1,5 +1,5 @@
-export const PLUGIN_NAME = 'RollbarSourceMapPlugin';
+export const PLUGIN_NAME = 'ElasticApmSourceMapPlugin';
 
-export const ROLLBAR_ENDPOINT = 'https://api.rollbar.com/api/1/sourcemap';
+export const ELASTIC_APM_ENDPOINT = 'http://localhost:8200/assets/v1/sourcemaps';
 
-export const ROLLBAR_REQ_FIELDS = ['accessToken', 'version', 'publicPath'];
+export const ELASTIC_APM_REQ_FIELDS = ['version', 'publicPath'];

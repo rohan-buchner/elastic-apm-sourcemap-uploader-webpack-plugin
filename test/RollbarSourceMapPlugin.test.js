@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import nock from 'nock';
-import RollbarSourceMapPlugin from '../src/RollbarSourceMapPlugin';
-import { PLUGIN_NAME, ROLLBAR_ENDPOINT } from '../src/constants';
+import RollbarSourceMapPlugin from '../src/ElasticApmSourceMapPlugin';
+import { PLUGIN_NAME, ELASTIC_APM_ENDPOINT } from '../src/constants';
 
 describe('RollbarSourceMapPlugin', () => {
   let compiler;
@@ -73,8 +73,8 @@ describe('RollbarSourceMapPlugin', () => {
       expect(plugin.includeChunks).toEqual(['foo', 'bar']);
     });
 
-    it('defaults rollbarEndpoint to ROLLBAR_ENDPOINT constant', () => {
-      expect(plugin.rollbarEndpoint).toEqual(ROLLBAR_ENDPOINT);
+    it('defaults rollbarEndpoint to ELASTIC_APM_ENDPOINT constant', () => {
+      expect(plugin.rollbarEndpoint).toEqual(ELASTIC_APM_ENDPOINT);
     });
 
     it('access string value for rollbarEndpoint', () => {
@@ -531,7 +531,7 @@ describe('RollbarSourceMapPlugin', () => {
         .replyWithError('something awful happened');
 
       await expect(plugin.uploadSourceMap(compilation, chunk)).rejects.toThrow(
-        `failed to upload vendor.5190.js.map to Rollbar: request to ${ROLLBAR_ENDPOINT} failed, reason: something awful happened`
+        `failed to upload vendor.5190.js.map to Rollbar: request to ${ELASTIC_APM_ENDPOINT} failed, reason: something awful happened`
       );
     });
   });
