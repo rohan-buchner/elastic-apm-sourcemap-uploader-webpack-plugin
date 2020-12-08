@@ -1,4 +1,4 @@
-import { ROLLBAR_REQ_FIELDS } from '../src/constants';
+import { ELASTIC_APM_REQ_FIELDS } from '../src/constants';
 import * as helpers from '../src/helpers';
 
 describe('helpers', () => {
@@ -110,19 +110,19 @@ describe('helpers', () => {
       const options = {};
       const result = helpers.validateOptions(options);
       expect(result).toBeInstanceOf(Array);
-      expect(result.length).toBe(ROLLBAR_REQ_FIELDS.length);
+      expect(result.length).toBe(ELASTIC_APM_REQ_FIELDS.length);
     });
 
     it('handles null for options', () => {
       const result = helpers.validateOptions(null);
       expect(result).toBeInstanceOf(Array);
-      expect(result.length).toBe(ROLLBAR_REQ_FIELDS.length);
+      expect(result.length).toBe(ELASTIC_APM_REQ_FIELDS.length);
     });
 
     it('handles no options passed', () => {
       const result = helpers.validateOptions();
       expect(result).toBeInstanceOf(Array);
-      expect(result.length).toBe(ROLLBAR_REQ_FIELDS.length);
+      expect(result.length).toBe(ELASTIC_APM_REQ_FIELDS.length);
     });
 
     it('returns an error if publicPath is not a string nor a function', () => {

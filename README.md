@@ -1,20 +1,15 @@
-# RollbarSourceMapPlugin
+# ElasticApmSourceMapUploaderPlugin
 
-[![Dependency Status](https://img.shields.io/david/thredup/rollbar-sourcemap-webpack-plugin.svg?style=flat-square)](https://david-dm.org/thredup/rollbar-sourcemap-webpack-plugin)
-[![devDependency Status](https://img.shields.io/david/dev/thredup/rollbar-sourcemap-webpack-plugin.svg?maxAge=2592000?style=flat-square)](https://david-dm.org/thredup/rollbar-sourcemap-webpack-plugin#info=devDependencies)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=thredup/rollbar-sourcemap-webpack-plugin)](https://dependabot.com)
-[![Actions Status](https://github.com/thredup/rollbar-sourcemap-webpack-plugin/workflows/CI/badge.svg)](https://github.com/thredup/rollbar-sourcemap-webpack-plugin/actions)
-[![Coverage](https://img.shields.io/codecov/c/github/thredup/rollbar-sourcemap-webpack-plugin/master.svg?style=flat-square)](https://codecov.io/gh/thredup/rollbar-sourcemap-webpack-plugin)
-[![Downloads](https://img.shields.io/npm/dm/rollbar-sourcemap-webpack-plugin.svg?style=flat-square)](https://www.npmjs.com/package/rollbar-sourcemap-webpack-plugin)
+This is a port of [ RollbarSourceMapPlugin](https://github.com/thredup/rollbar-sourcemap-webpack-plugin#readme), 
+converted to upload to ElasticAPM instead of Rollbar.
+
+The difference between this implementation and [elastic-apm-sourcemap-webpack-plugin](https://github.com/wuct/elastic-apm-sourcemap-webpack-plugin#readme),
+is that with SourceMapUploader, like its base plugin, the sourcemaps get uploaded during the build pipeline, and not exposed to the outside world.
+
+<hr/>
 
 This is a [Webpack](https://webpack.github.io) plugin that simplifies uploading the sourcemaps,
-generated from a webpack build, to [Rollbar](https://rollbar.com).
-
-Production JavaScript bundles are typically minified before deploying,
-making Rollbar stacktraces pretty useless unless you take steps to upload the sourcemaps.
-You may be doing this now in a shell script, triggered during your deploy process,
-that makes curl posts to the Rollbar API. This can be finicky and error prone to setup.
-RollbarSourceMapPlugin aims to remove that burden and automatically upload the sourcemaps when they are emitted by webpack.
+generated from a webpack build, to [Elastic APM Server](https://www.elastic.co/guide/en/apm/server/7.10/overview.html).
 
 ## Prerequisites
 
@@ -25,7 +20,7 @@ RollbarSourceMapPlugin aims to remove that burden and automatically upload the s
 Install the plugin with npm:
 
 ```shell
-npm install rollbar-sourcemap-webpack-plugin --save-dev
+npm install elastic-apm-sourcemap-uploader-webpack-plugin --save-dev
 ```
 
 ## Basic Usage
@@ -33,35 +28,38 @@ npm install rollbar-sourcemap-webpack-plugin --save-dev
 An example webpack.config.js:
 
 ```javascript
-const RollbarSourceMapPlugin = require('rollbar-sourcemap-webpack-plugin')
-
-const PUBLIC_PATH = 'https://my.cdn.net/assets'
+const ElasticApmSourceMapPlugin = require('elastic-apm-sourcemap-uploader-webpack-plugin')
+const PUBLIC_PATH = '/';
 
 const webpackConfig = {
   mode: 'production',
-  devtool: 'hidden-source-map'
+  devtool: 'hidden-source-map',
   entry: 'index',
   publicPath: PUBLIC_PATH,
   output: {
     path: 'dist',
     filename: 'index-[hash].js'
   },
-  plugins: [new RollbarSourceMapPlugin({
-    accessToken: 'aaaabbbbccccddddeeeeffff00001111',
-    version: 'version_string_here',
-    publicPath: PUBLIC_PATH
+  plugins: [new ElasticApmSourceMapPlugin({
+    accessToken: '<YOU_ACCESS_TOKEN>',
+    serviceName: 'your-service-name',
+    version: '4.0.0',
+    apmEndpoint: `http://localhost:8200/assets/v1/sourcemaps`,
+    publicPath: PUBLIC_PATH,
+    silent: false,
+    ignoreErrors: false,
   })]
 }
 ```
 
 ## Plugin Configuration
 
-You can pass a hash of configuration options to `RollbarSourceMapPlugin`.
+You can pass a hash of configuration options to `ElasticApmSourceMapPlugin`.
 Allowed values are as follows:
 
 ### `accessToken: string` **(required)**
 
-Your rollbar `post_server_item` access token.
+Your elastic apm `api_key`.
 
 ### `version: string` **(required)**
 
@@ -90,9 +88,9 @@ If `false`, success and warning messages will be logged to the console for each 
 Set to `true` to bypass adding upload errors to the webpack compilation. Do this if you do not want to fail the build when sourcemap uploads fail.
 If you do not want to fail the build but you do want to see the failures as warnings, make sure `silent` option is set to `false`.
 
-### `rollbarEndpoint: string` **(default: `https://api.rollbar.com/api/1/sourcemap`)**
+### `apmEndpoint: string` **(default: `https://localhost:8200/assets/v1/sourcemap`)**
 
-A string defining the Rollbar API endpoint to upload the sourcemaps to. It can be used for self-hosted Rollbar instances.
+A string defining the Elastic APM API endpoint to upload the sourcemaps to.
 
 ### `encodeFilename: boolean` **(default: `false`)**
 
@@ -119,11 +117,8 @@ output: {
 
 ## App Configuration
 
-- The web app should have [Rollbar.js](https://www.npmjs.com/package/rollbar) installed and configured for webpack as described [here](https://github.com/rollbar/rollbar.js/tree/master/examples/webpack#using-rollbar-with-webpack).
-- See the [Rollbar source map](https://rollbar.com/docs/source-maps/) documentation
-  for how to configure the client side for sourcemap support.
-  The `code_version` parameter must match the `version` parameter used for the plugin.
-- More general info on the using [Rollbar for browser JS](https://rollbar.com/docs/notifier/rollbar.js/).
+- The web app should have [RUM.JS](https://www.elastic.co/guide/en/apm/agent/rum-js/5.x/install-the-agent.html) Agent installed.
+- Your elastic instance should have the apm-agent available [Elastic setup APM docs](https://www.elastic.co/guide/en/apm/server/7.10/installing.html).
 
 ## Examples
 
