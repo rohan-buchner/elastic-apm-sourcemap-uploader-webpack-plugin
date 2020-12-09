@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+import { promises as fs, createReadStream  } from 'fs';
 
 import { join } from 'path';
 import fetch from 'node-fetch';
@@ -10,7 +10,8 @@ import { PLUGIN_NAME, ELASTIC_APM_ENDPOINT } from './constants';
 
 class ElasticApmSourceMapPlugin {
   constructor({
-    accessToken,
+    apiKey,
+    apmToken,
     serviceName,
     version,
     publicPath,
@@ -20,7 +21,8 @@ class ElasticApmSourceMapPlugin {
     apmEndpoint = ELASTIC_APM_ENDPOINT,
     encodeFilename = false
   }) {
-    this.accessToken = accessToken;
+    this.apiKey = apiKey;
+    this.apmToken = apmToken;
     this.serviceName = serviceName;
     this.version = version;
     this.publicPath = publicPath;
@@ -64,7 +66,7 @@ class ElasticApmSourceMapPlugin {
 
   getSource(compilation, name) {
     const path = this.getAssetPath(compilation, name);
-    return fs.readFile(path, { encoding: 'utf-8' });
+    return createReadStream(path, { encoding: 'utf-8' });
   }
 
   getAssets(compilation) {
@@ -103,7 +105,7 @@ class ElasticApmSourceMapPlugin {
   }
 
   async uploadSourceMap(compilation, { sourceFile, sourceMap }) {
-    const errMessage = `failed to upload ${sourceMap} to Rollbar`;
+    const errMessage = `failed to upload ${sourceMap} to Elastic Apm`;
     let sourceMapSource;
 
     try {
@@ -119,8 +121,12 @@ class ElasticApmSourceMapPlugin {
     form.append('service_name', this.serviceName);
 
     const headers = {};
-    if (this.accessToken) {
-      headers.Authorization = `ApiKey ${this.accessToken}`;
+    if (this.apiKey) {
+      headers.Authorization = `ApiKey ${this.apiKey}`;
+    }
+
+    if (this.apmToken) {
+      headers.Authorization = `Bearer ${this.apmToken}`;
     }
 
     let res;
