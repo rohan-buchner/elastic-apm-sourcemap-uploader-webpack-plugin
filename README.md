@@ -4,7 +4,7 @@ This is a port of [ RollbarSourceMapPlugin](https://github.com/thredup/rollbar-s
 converted to upload to ElasticAPM instead of Rollbar.
 
 The difference between this implementation and [elastic-apm-sourcemap-webpack-plugin](https://github.com/wuct/elastic-apm-sourcemap-webpack-plugin#readme),
-is that with SourceMapUploader, like its base plugin, the sourcemaps get uploaded during the build pipeline, and not exposed to the outside world.
+is that with [ElasticApmSourceMapUploader](https://github.com/rohan-buchner/elastic-apm-sourcemap-uploader-webpack-plugin#readme), like its base (Rollbar) plugin, the sourcemaps get uploaded during the build pipeline, and not exposed to the outside world.
 
 <hr/>
 
