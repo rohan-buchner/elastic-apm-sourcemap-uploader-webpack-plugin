@@ -28,7 +28,7 @@ npm install elastic-apm-sourcemap-uploader-webpack-plugin --save-dev
 An example webpack.config.js:
 
 ```javascript
-const ElasticApmSourceMapPlugin = require('elastic-apm-sourcemap-uploader-webpack-plugin')
+const ApmSourceMapUploader = require('elastic-apm-sourcemap-uploader-webpack-plugin')
 const PUBLIC_PATH = '/';
 
 const webpackConfig = {
@@ -40,7 +40,7 @@ const webpackConfig = {
     path: 'dist',
     filename: 'index-[hash].js'
   },
-  plugins: [new ElasticApmSourceMapPlugin({
+  plugins: [new ApmSourceMapUploader({
     accessToken: '<YOU_ACCESS_TOKEN>',
     serviceName: 'your-service-name',
     version: '4.0.0',
@@ -59,7 +59,11 @@ Allowed values are as follows:
 
 ### `accessToken: string` **(required)**
 
-Your elastic apm `api_key`.
+Appends a `Bearer <token>` header
+
+### `apiKey: string` **(required)**
+
+Appends a `ApiKey <key>` header
 
 ### `version: string` **(required)**
 
